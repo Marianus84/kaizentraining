@@ -1,654 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaizen Strength Pro - Shodokan Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { 
-            --gold: #b89b5e; 
-            --dark: #1a1a1a; 
-            --bg-paper: #f4f1ea; 
-            --ink: #2c2c2c; 
-            --danger: #96281b; 
-            --border: #d1cfc7;
-        }
-        
-        body { 
-            font-family: 'Georgia', 'Times New Roman', serif; 
-            background: var(--bg-paper); 
-            color: var(--ink); 
-            margin: 0; 
-            padding: 20px; 
-            line-height: 1.6;
-        }
-
-        .container { 
-            max-width: 500px; 
-            margin: auto; 
-            border: 1px solid var(--border);
-            padding: 30px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        h1 { 
-            text-align: center; 
-            letter-spacing: 5px; 
-            text-transform: uppercase;
-            font-weight: 300;
-            border-bottom: 1px solid var(--ink);
-            padding-bottom: 10px;
-            margin-bottom: 5px;
-        }
-
-        .week-tag { 
-            text-align: center; 
-            color: var(--gold); 
-            font-style: italic; 
-            font-size: 1.1rem; 
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .muscle-map {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .muscle-zone {
-            font-size: 0.65rem;
-            padding: 5px;
-            border: 1px solid var(--border);
-            color: #ccc;
-            text-transform: uppercase;
-            transition: 0.5s;
-            background: transparent;
-        }
-        
-        .progress-container { 
-            background: #eee; 
-            height: 20px; 
-            margin-bottom: 30px; 
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #progress-bar { 
-            background: var(--ink); 
-            height: 100%; 
-            width: 0%; 
-            transition: 0.8s ease-in-out; 
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-        #progress-text {
-            position: relative;
-            z-index: 1;
-            font-size: 0.75rem;
-            color: var(--gold);
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .exercise-item { 
-            background: white; 
-            padding: 18px; 
-            margin-bottom: 15px; 
-            border: 1px solid var(--border);
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            transition: 0.3s; 
-        }
-        .exercise-item.completed { 
-            background: #fafafa;
-            border-color: #eee;
-            opacity: 0.6; 
-        }
-        .ex-info { flex-grow: 1; margin-left: 15px; }
-        .ex-info strong { display: block; font-size: 1.2rem; font-weight: 400; color: var(--ink); }
-        .ex-info .muscle-label { 
-            font-size: 0.6rem; 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            vertical-align: middle;
-            margin-left: 5px;
-            font-weight: bold;
-        }
-        .ex-info small { color: #777; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .actions { display: flex; gap: 15px; }
-        .btn-edit { color: #999; cursor: pointer; background: none; border: none; font-size: 1rem; transition: 0.3s; }
-        .btn-delete { color: #ccc; cursor: pointer; background: none; border: none; font-size: 1rem; transition: 0.3s; }
-        
-        .form-group { 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--gold);
-        }
-        
-        .form-group label {
-            display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gold);
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
-        .muscle-selector {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin: 10px 0;
-        }
-        .muscle-opt {
-            font-size: 0.65rem;
-            padding: 8px 4px;
-            border: 1px solid var(--border);
-            background: white;
-            cursor: pointer;
-            text-transform: uppercase;
-            text-align: center;
-        }
-        .muscle-opt.selected {
-            background: var(--ink);
-            color: white;
-            border-color: var(--ink);
-        }
-
-        input, select { 
-            background: white; 
-            border: 1px solid var(--border); 
-            color: var(--ink); 
-            padding: 12px; 
-            margin: 8px 0; 
-            width: 100%; 
-            font-family: serif;
-            box-sizing: border-box;
-        }
-
-        .main-btn { 
-            background: var(--ink); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer; 
-            width: 100%; 
-            margin-top: 15px; 
-        }
-        .main-btn:disabled { background: #ccc; }
-
-        .add-btn { 
-            background: transparent; 
-            color: var(--ink); 
-            border: 1px solid var(--ink); 
-            padding: 10px; 
-            width: 100%; 
-            cursor: pointer; 
-            margin-top: 20px; 
-            letter-spacing: 1px;
-        }
-
-        .backup-zone {
-            margin-top: 30px;
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .btn-backup {
-            flex: 1;
-            background: #f8f8f8;
-            border: 1px solid var(--border);
-            padding: 8px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            color: #666;
-        }
-        
-        input[type="checkbox"] { 
-            width: 20px; 
-            height: 20px; 
-            accent-color: var(--ink); 
-        }
-
-        /* Estilos Gráfica */
-        .chart-section {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 2px solid var(--gold);
-        }
-        .chart-controls {
-            margin-bottom: 15px;
-        }
-        .chart-controls label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: var(--gold);
-            letter-spacing: 1px;
-        }
-
-        .footer-note { 
-            font-size: 0.75rem; 
-            color: #999; 
-            margin-top: 15px; 
-            text-align: center;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d19">
+<title>MEALBRIDGE — Mindful Meal System</title>
+<style>
+:root{--bg:#070b14;--panel:#111a2a;--panel2:#172337;--gold:#e3bd68;--gold2:#a98136;--text:#f5f2e9;--muted:#aab4c4;--line:#29364b;--green:#70d69a;--red:#ff8e8e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#172b46 0,#080e1a 45%,#050810 100%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:22px 16px 50px}.hero{text-align:center;padding:22px 8px 26px;background:linear-gradient(180deg,#1b2c42aa,#10182766);border:1px solid #31415a;border-radius:22px;margin-bottom:18px}
+.logo{font-family:Georgia,serif;letter-spacing:.16em;color:var(--gold);font-size:clamp(28px,7vw,44px);margin:0}.tag{font-size:11px;letter-spacing:.2em;color:#d5c08e;margin-top:5px}.date{color:var(--muted);font-size:13px;margin-top:14px}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px;color:var(--gold)}
+.card{background:linear-gradient(145deg,#152238,#0e1726);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 30px #0003}
+.meal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.pill{font-size:11px;border:1px solid #816b3c;color:var(--gold);padding:4px 9px;border-radius:20px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin:8px 0 5px}.field input{width:100%;background:#09111e;border:1px solid #34445c;color:var(--text);padding:12px;border-radius:10px;font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:12px 15px;font-weight:650;font-size:14px}.primary{background:linear-gradient(100deg,#f0d48d,#c69b4a);color:#17130a}.secondary{background:#202e43;color:var(--text);border:1px solid #3a4b64}.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.kcal{font-size:34px;color:var(--gold);font-weight:750;letter-spacing:-1px}.muted{color:var(--muted);font-size:13px}.split{display:grid;grid-template-columns:4fr 1fr;gap:8px;margin:14px 0}.split div{padding:13px;border-radius:12px;background:#20334a}.split div:last-child{background:#3b3020;border:1px solid #806638}.split strong{display:block;font-size:23px;color:var(--gold)}.bar{height:12px;background:#29374a;border-radius:99px;overflow:hidden;display:flex}.bar .eighty{width:80%;background:#d6b15e}.bar .twenty{width:20%;background:#7b91b0}
+.timer{text-align:center;padding:12px}.clock{font-size:clamp(48px,13vw,72px);font-variant-numeric:tabular-nums;color:var(--gold);font-weight:700;line-height:1.2;margin:8px}.timer-note{max-width:430px;margin:10px auto;color:var(--muted);font-size:13px}
+.checkline{display:flex;align-items:center;gap:9px;margin:10px 0;color:#e7eaf0;font-size:14px}.checkline input{accent-color:var(--gold);width:18px;height:18px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{background:#0b1422;border:1px solid var(--line);padding:12px;border-radius:12px}.metric strong{display:block;color:var(--gold);font-size:22px}.metric span{font-size:11px;color:var(--muted)}
+.notice{border-left:3px solid var(--gold);padding:9px 12px;background:#201d18;color:#e6d7b5;font-size:12px;border-radius:0 9px 9px 0;margin-top:12px}
+footer{text-align:center;color:#78869a;font-size:11px;padding:18px}
+@media(max-width:520px){.wrap{padding:12px}.card{padding:15px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr 1fr}.actions button{min-width:100px}}
+</style>
 </head>
 <body>
+<main class="wrap">
+<header class="hero">
+  <h1 class="logo">MEALBRIDGE</h1><div class="tag">THE MINDFUL THREE-MEAL SYSTEM</div>
+  <div class="date" id="today"></div>
+</header>
 
-<div class="container">
-    <h1>改善 KAIZEN</h1>
-    <div id="week-display" class="week-tag">Semana 1</div>
+<section class="card">
+ <div class="meal-head"><h2>01 · Desayuno</h2><span class="pill">REGISTRO MANUAL</span></div>
+ <div class="grid">
+  <div class="field"><label for="breakfastName">Descripción (opcional)</label><input id="breakfastName" placeholder="Ej. yogur, fruta y avena"></div>
+  <div class="field"><label for="breakfastKcal">Calorías del desayuno</label><input id="breakfastKcal" type="number" min="0" step="1" placeholder="0"></div>
+ </div>
+ <div class="actions"><button class="primary" id="saveBreakfast">Guardar desayuno</button></div>
+ <p class="muted" id="breakfastStatus">Desayuno todavía sin registrar.</p>
+</section>
 
-    <div class="muscle-map" id="muscle-map">
-        <div class="muscle-zone" data-muscle="Hombros">Hombros</div>
-        <div class="muscle-zone" data-muscle="Pecho">Pecho</div>
-        <div class="muscle-zone" data-muscle="Espalda">Espalda</div>
-        <div class="muscle-zone" data-muscle="Brazos">Brazos</div>
-        <div class="muscle-zone" data-muscle="Core">Core</div>
-        <div class="muscle-zone" data-muscle="Piernas">Piernas</div>
-    </div>
-    
-    <div class="progress-container">
-        <div id="progress-bar"></div>
-        <div id="progress-text">0%</div>
-    </div>
+<section class="card">
+ <div class="meal-head"><h2>02 · Almuerzo</h2><span class="pill">REGISTRO MANUAL</span></div>
+ <p class="muted">Registra las calorías de la comida completa que te has servido inicialmente, antes de comer.</p>
+ <div class="grid">
+  <div class="field"><label for="lunchName">Descripción (opcional)</label><input id="lunchName" placeholder="Ej. milanesa napolitana"></div>
+  <div class="field"><label for="lunchKcal">Calorías de la comida inicial</label><input id="lunchKcal" type="number" min="0" step="1" placeholder="1000"></div>
+ </div>
+ <div class="actions"><button class="primary" id="saveLunch">Calcular reparto 80/20</button></div>
+ <div id="allocation" hidden>
+  <div class="split">
+   <div><strong id="lunch80">800 kcal</strong><span class="muted">80 % · Almuerzo</span></div>
+   <div><strong id="dinner20">200</strong><span class="muted">20 % · Cena</span></div>
+  </div>
+  <div class="bar"><div class="eighty"></div><div class="twenty"></div></div>
+  <p class="muted" id="allocationText"></p>
+ </div>
+ <div class="notice">El 80/20 es una distribución planificada de la comida inicial. No obliga a dejar comida si sigues teniendo hambre ni garantiza que esa cantidad sea suficiente para cenar.</div>
+</section>
 
-    <div id="form-area" class="form-group" style="display: none;">
-        <h3 id="form-title" style="margin-top:0; font-weight: 300;">Nuevo Entrenamiento</h3>
-        <input type="hidden" id="edit-index">
-        
-        <label>Nombre del Ejercicio</label>
-        <input type="text" id="ex-name" placeholder="Ej: Press de Banca">
-        
-        <label>Músculos Implicados</label>
-        <div class="muscle-selector" id="muscle-selector-form">
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Hombros">Hombros</div>
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Pecho">Pecho</div>
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Espalda">Espalda</div>
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Brazos">Brazos</div>
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Core">Core</div>
-            <div class="muscle-opt" onclick="toggleMuscleOpt(this)" data-val="Piernas">Piernas</div>
-        </div>
-        
-        <label>Peso (Kg)</label>
-        <input type="number" id="ex-weight" placeholder="0">
-        
-        <label>Series</label>
-        <input type="number" id="ex-sets" placeholder="0">
-        
-        <label>Repeticiones</label>
-        <input type="number" id="ex-reps" placeholder="0">
-        
-        <button class="main-btn" onclick="saveExercise()">REGISTRAR</button>
-        <button class="btn-edit" style="width: 100%; margin-top: 10px;" onclick="toggleForm()">Cancelar</button>
-    </div>
+<section class="card timer">
+ <h2>03 · Pausa consciente</h2><span class="pill">TEMPORIZADOR · 5 MINUTOS</span>
+ <div class="clock" id="clock">05:00</div>
+ <p class="timer-note">Actívalo aproximadamente a mitad del almuerzo. Deja los cubiertos, descansa y observa cómo te sientes antes de continuar.</p>
+ <div class="actions"><button class="primary" id="startTimer">Iniciar pausa</button><button class="secondary" id="pauseTimer">Pausar</button><button class="ghost" id="resetTimer">Reiniciar</button></div>
+ <p class="muted" id="timerStatus" aria-live="polite">Listo para empezar.</p>
+</section>
 
-    <div id="workout-area"></div>
+<section class="card">
+ <div class="meal-head"><h2>04 · Cena</h2><span class="pill">CÁLCULO AUTOMÁTICO</span></div>
+ <div class="kcal" id="dinnerValue">— kcal</div>
+ <p class="muted">Reserva calculada: 20 % de las calorías iniciales del almuerzo.</p>
+ <div class="field"><label for="dinnerExtra">Complementos de la cena (kcal, opcional)</label><input id="dinnerExtra" type="number" min="0" step="1" value="0"></div>
+ <label class="checkline"><input type="checkbox" id="stored"> He guardado la reserva en el recipiente y refrigerado la comida.</label>
+ <label class="checkline"><input type="checkbox" id="dinnerDone"> He terminado de cenar.</label>
+ <p class="muted" id="dinnerStatus">La cena se calculará al registrar el almuerzo.</p>
+ <div class="notice">La cifra de cena es una asignación prevista, no una afirmación de que hayas consumido esas calorías. Registra los complementos y confirma lo que realmente comas.</div>
+</section>
 
-    <button id="finish-btn" class="main-btn" disabled onclick="applyKaizen()">COMPLETAR CICLO (KAIZEN +1)</button>
-    
-    <button class="add-btn" id="btn-show-form" onclick="toggleForm()">+ AÑADIR DISCIPLINA</button>
-
-    <div class="chart-section">
-        <div class="chart-controls">
-            <label>Ver progreso de:</label>
-            <select id="chart-filter" onchange="updateChart()">
-                <option value="all">Todos los ejercicios</option>
-            </select>
-        </div>
-        <div style="width: 100%; overflow-x: auto;">
-            <canvas id="progressChart" style="min-height: 250px;"></canvas>
-        </div>
-    </div>
-
-    <div class="backup-zone">
-        <button class="btn-backup" onclick="exportBackup()">Exportar Backup</button>
-        <button class="btn-backup" onclick="importBackup()">Importar Backup</button>
-    </div>
-    
-    <p class="footer-note">
-        Hipertrofia: máx 15 reps. Luego se añade serie.<br>
-        Fuerza para tu Aikido y para ayudar a tu hermano.
-    </p>
-</div>
-
+<section class="card">
+ <h2>Resumen del día</h2>
+ <div class="summary">
+  <div class="metric"><strong id="sumBreakfast">0</strong><span>Desayuno kcal</span></div>
+  <div class="metric"><strong id="sumLunch">0</strong><span>Almuerzo asignado kcal</span></div>
+  <div class="metric"><strong id="sumDinner">0</strong><span>Cena prevista kcal</span></div>
+ </div>
+ <div class="actions"><button class="secondary" id="exportJson">Exportar JSON</button><button class="ghost" id="importJson">Importar JSON</button><input id="jsonFile" type="file" accept="application/json,.json" hidden></div>
+ <p class="muted">Los datos se guardan en este navegador. Exporta una copia para conservarlos o trasladarlos a otro dispositivo.</p>
+</section>
+<footer>MEALBRIDGE · SERVE. SAVOR. SAVE.<br>Prototipo local · No sustituye asesoramiento nutricional.</footer>
+</main>
 <script>
-    let chartInstance = null;
-    let appData = JSON.parse(localStorage.getItem('kaizenData')) || {
-        week: 1,
-        history: [], 
-        exercises: [
-            { name: "Romanian Deadlifts", muscles: ["Espalda", "Piernas"], weight: 16, sets: 3, reps: 6, completed: false },
-            { name: "Gorilla Rows", muscles: ["Espalda", "Brazos"], weight: 16, sets: 3, reps: 10, completed: false },
-            { name: "Goblet Squats", muscles: ["Piernas", "Core"], weight: 16, sets: 3, reps: 6, completed: false },
-            { name: "2 Handed Swing", muscles: ["Core", "Piernas", "Espalda"], weight: 16, sets: 3, reps: 10, completed: false },
-            { name: "Overhead Press", muscles: ["Hombros", "Brazos"], weight: 16, sets: 3, reps: 8, completed: false },
-            { name: "Reverse Lunge", muscles: ["Piernas"], weight: 16, sets: 3, reps: 6, completed: false }
-        ]
-    };
-
-    function toggleMuscleOpt(el) { el.classList.toggle('selected'); }
-
-    function getSelectedMuscles() {
-        return Array.from(document.querySelectorAll('.muscle-opt.selected')).map(el => el.dataset.val);
-    }
-
-    function toggleForm() {
-        const form = document.getElementById('form-area');
-        const btn = document.getElementById('btn-show-form');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        btn.style.display = form.style.display === 'none' ? 'block' : 'none';
-        clearForm();
-    }
-
-    function clearForm() {
-        document.getElementById('ex-name').value = '';
-        document.querySelectorAll('.muscle-opt').forEach(el => el.classList.remove('selected'));
-        document.getElementById('ex-weight').value = '';
-        document.getElementById('ex-sets').value = '';
-        document.getElementById('ex-reps').value = '';
-        document.getElementById('edit-index').value = '';
-        document.getElementById('form-title').innerText = "Nuevo Entrenamiento";
-    }
-
-    function saveExercise() {
-        const name = document.getElementById('ex-name').value;
-        const muscles = getSelectedMuscles();
-        const weight = parseFloat(document.getElementById('ex-weight').value) || 0;
-        const sets = parseInt(document.getElementById('ex-sets').value);
-        const reps = parseInt(document.getElementById('ex-reps').value);
-        const editIndex = document.getElementById('edit-index').value;
-
-        if(!name || !sets || !reps || muscles.length === 0) return alert("Mariano, completá todos los campos.");
-
-        const newEx = { name, muscles, weight, sets, reps, completed: false };
-
-        if(editIndex === "") {
-            appData.exercises.push(newEx);
-        } else {
-            appData.exercises[editIndex] = { ...appData.exercises[editIndex], name, muscles, weight, sets, reps };
-        }
-        toggleForm();
-        render();
-    }
-
-    function deleteExercise(index) {
-        if(confirm("¿Borrar?")) {
-            appData.exercises.splice(index, 1);
-            render();
-        }
-    }
-
-    function editExercise(index) {
-        const ex = appData.exercises[index];
-        document.getElementById('ex-name').value = ex.name;
-        document.querySelectorAll('.muscle-opt').forEach(el => {
-            if(ex.muscles && ex.muscles.includes(el.dataset.val)) el.classList.add('selected');
-            else el.classList.remove('selected');
-        });
-        document.getElementById('ex-weight').value = ex.weight || 0;
-        document.getElementById('ex-sets').value = ex.sets;
-        document.getElementById('ex-reps').value = ex.reps;
-        document.getElementById('edit-index').value = index;
-        document.getElementById('form-title').innerText = "Ajustar Técnica";
-        document.getElementById('form-area').style.display = 'block';
-        document.getElementById('btn-show-form').style.display = 'none';
-    }
-
-    function toggleComplete(index) {
-        appData.exercises[index].completed = !appData.exercises[index].completed;
-        if (navigator.vibrate) navigator.vibrate(100);
-        const allCompleted = appData.exercises.every(ex => ex.completed);
-        if (allCompleted) {
-            playClaps();
-            setTimeout(() => alert("¡Increíble Mariano! Has completado toda la disciplina de la semana. ¡Fuerza y Honor!"), 100);
-        }
-        render();
-    }
-
-    function playClaps() {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        for(let i=0; i<5; i++) {
-            const oscillator = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(150 + (i * 50), audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            oscillator.connect(gain);
-            gain.connect(audioCtx.destination);
-            oscillator.start(audioCtx.currentTime + (i * 0.1));
-            oscillator.stop(audioCtx.currentTime + (i * 0.1) + 0.2);
-        }
-    }
-
-    function applyKaizen() {
-        if(!appData.history) appData.history = [];
-        
-        // Guardar progreso actual en historia
-        appData.exercises.forEach(ex => {
-            appData.history.push({
-                week: appData.week,
-                name: ex.name,
-                weight: ex.weight,
-                sets: ex.sets,
-                reps: ex.reps,
-                volume: ex.weight * ex.sets * ex.reps
-            });
-        });
-
-        appData.week++;
-        appData.exercises.forEach(ex => {
-            if (ex.reps >= 15) { ex.reps = 8; ex.sets += 1; } 
-            else { ex.reps += 1; }
-            ex.completed = false;
-        });
-        alert("¡Kaizen aplicado! Ciclo completado y guardado en historial.");
-        render();
-    }
-
-    function updateChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        const filter = document.getElementById('chart-filter').value;
-        
-        if (!appData.history || appData.history.length === 0) {
-            if (chartInstance) chartInstance.destroy();
-            return;
-        }
-
-        const uniqueWeeks = [...new Set(appData.history.map(h => h.week))].sort((a,b) => a-b);
-        const labels = uniqueWeeks.map(w => `Sem ${w}`);
-        
-        let namesToGraph = [];
-        if (filter === 'all') {
-            namesToGraph = [...new Set(appData.history.map(h => h.name))];
-        } else {
-            namesToGraph = [filter];
-        }
-
-        const datasets = namesToGraph.map((name, index) => {
-            const colors = ['#b89b5e', '#2c2c2c', '#96281b', '#5d6d7e', '#2ecc71', '#3498db'];
-            return {
-                label: name,
-                data: uniqueWeeks.map(w => {
-                    const entry = appData.history.find(h => h.name === name && h.week === w);
-                    return entry ? entry.volume : null;
-                }),
-                borderColor: colors[index % colors.length],
-                backgroundColor: 'transparent',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: 4,
-                spanGaps: true
-            };
-        });
-
-        if (chartInstance) chartInstance.destroy();
-
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: { labels: labels, datasets: datasets },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { 
-                        display: filter === 'all', 
-                        position: 'bottom',
-                        labels: { font: { family: 'serif', size: 10 } } 
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                let val = context.parsed.y;
-                                const weekNum = uniqueWeeks[context.dataIndex];
-                                const h = appData.history.find(x => x.name === label && x.week === weekNum);
-                                return h ? `${label}: ${val}kg (${h.weight}kg x ${h.sets}x${h.reps})` : `${label}: ${val}kg`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        title: { display: true, text: 'Volumen Total (kg)', font: { family: 'serif' } },
-                        grid: { color: '#f0f0f0' } 
-                    },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { font: { family: 'serif' } }
-                    }
-                }
-            }
-        });
-    }
-
-    function populateFilter() {
-        const select = document.getElementById('chart-filter');
-        const currentVal = select.value;
-        
-        // Obtenemos todos los nombres del historial para que no se pierdan ejercicios antiguos
-        const historyNames = appData.history ? [...new Set(appData.history.map(h => h.name))] : [];
-        const currentNames = appData.exercises.map(e => e.name);
-        const allNames = [...new Set([...historyNames, ...currentNames])].sort();
-        
-        select.innerHTML = '<option value="all">Todos los ejercicios</option>';
-        allNames.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            select.appendChild(opt);
-        });
-        
-        // Restauramos valor si existe
-        if (allNames.includes(currentVal)) select.value = currentVal;
-    }
-
-    function exportBackup() {
-        const dataStr = JSON.stringify(appData);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', `kaizen_backup_sem${appData.week}.json`);
-        linkElement.click();
-    }
-
-    function importBackup() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = e => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.readAsText(file,'UTF-8');
-            reader.onload = readerEvent => {
-                try {
-                    const imported = JSON.parse(readerEvent.target.result);
-                    if(imported.week && imported.exercises) {
-                        appData = imported;
-                        render();
-                    } else { alert("Archivo no válido."); }
-                } catch (err) { alert("Error al leer archivo."); }
-            }
-        }
-        input.click();
-    }
-
-    function render() {
-        const area = document.getElementById('workout-area');
-        area.innerHTML = '';
-        let completedCount = 0;
-        let muscleHits = {};
-
-        const sortedExercises = appData.exercises
-            .map((ex, index) => ({ ...ex, originalIndex: index }))
-            .sort((a, b) => a.completed - b.completed);
-
-        sortedExercises.forEach((ex) => {
-            const div = document.createElement('div');
-            div.className = `exercise-item ${ex.completed ? 'completed' : ''}`;
-            const muscleText = ex.muscles ? ex.muscles.join(', ') : '';
-            div.innerHTML = `
-                <input type="checkbox" ${ex.completed ? 'checked' : ''} onchange="toggleComplete(${ex.originalIndex})">
-                <div class="ex-info" onclick="toggleComplete(${ex.originalIndex})" style="cursor:pointer">
-                    <strong>${ex.name} <span class="muscle-label">${muscleText}</span></strong>
-                    <small>${ex.weight}kg — ${ex.sets}x${ex.reps}</small>
-                </div>
-                <div class="actions">
-                    <button class="btn-edit" onclick="event.stopPropagation(); editExercise(${ex.originalIndex})">✎</button>
-                    <button class="btn-delete" onclick="event.stopPropagation(); deleteExercise(${ex.originalIndex})">×</button>
-                </div>
-            `;
-            area.appendChild(div);
-            if(ex.completed) {
-                completedCount++;
-                if(ex.muscles) ex.muscles.forEach(m => muscleHits[m] = (muscleHits[m] || 0) + 1);
-            }
-        });
-
-        const maxHits = Math.max(...Object.values(muscleHits), 0) || 1;
-        document.querySelectorAll('.muscle-zone').forEach(zone => {
-            const hits = muscleHits[zone.dataset.muscle] || 0;
-            if(hits > 0) {
-                zone.style.background = `rgba(184, 155, 94, ${0.3 + (hits / maxHits) * 0.7})`;
-                zone.style.color = "white";
-                zone.style.borderColor = "var(--gold)";
-            } else {
-                zone.style.background = "transparent"; zone.style.color = "#ccc"; zone.style.borderColor = "var(--border)";
-            }
-        });
-
-        const progress = appData.exercises.length > 0 ? Math.round((completedCount / appData.exercises.length) * 100) : 0;
-        document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('progress-text').innerText = progress + '%';
-        document.getElementById('finish-btn').disabled = completedCount < appData.exercises.length || completedCount === 0;
-        document.getElementById('week-display').innerText = `Semana ${appData.week}`;
-        
-        localStorage.setItem('kaizenData', JSON.stringify(appData));
-        populateFilter();
-        updateChart();
-    }
-
-    // Inicialización
-    window.onload = render;
+const KEY='mealbridgeDataV1';
+const fresh=()=>({date:new Date().toISOString().slice(0,10),breakfast:{name:'',kcal:0,registered:false},lunch:{name:'',initialKcal:0,registered:false},dinner:{reserveKcal:0,extraKcal:0,stored:false,done:false},timer:{completed:false}});
+let data=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||fresh()}catch{return fresh()}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));}
+const $=id=>document.getElementById(id);
+function num(id){return Math.max(0,Math.round(Number($(id).value)||0))}
+function render(){
+ $('today').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ $('breakfastName').value=data.breakfast.name||'';$('breakfastKcal').value=data.breakfast.kcal||'';
+ $('lunchName').value=data.lunch.name||'';$('lunchKcal').value=data.lunch.initialKcal||'';
+ $('breakfastStatus').textContent=data.breakfast.registered?`Registrado: ${data.breakfast.kcal} kcal`:'Desayuno todavía sin registrar.';
+ $('allocation').hidden=!data.lunch.registered;
+ if(data.lunch.registered){let n=data.lunch.initialKcal;let a=Math.round(n*.8),b=n-a;$('lunch80').textContent=a+' kcal';$('dinner20').textContent=b+' kcal';$('allocationText').textContent=`Comida inicial: ${n} kcal · reparto automático 80/20.`}
+ $('dinnerValue').textContent=data.lunch.registered?data.dinner.reserveKcal+' kcal':'— kcal';
+ $('dinnerExtra').value=data.dinner.extraKcal||0;$('stored').checked=!!data.dinner.stored;$('dinnerDone').checked=!!data.dinner.done;
+ $('dinnerStatus').textContent=data.lunch.registered?`Reserva prevista: ${data.dinner.reserveKcal} kcal · Cena prevista con complementos: ${data.dinner.reserveKcal+data.dinner.extraKcal} kcal.`:'La cena se calculará al registrar el almuerzo.';
+ $('sumBreakfast').textContent=data.breakfast.registered?data.breakfast.kcal:0;
+ $('sumLunch').textContent=data.lunch.registered?Math.round(data.lunch.initialKcal*.8):0;
+ $('sumDinner').textContent=data.lunch.registered?data.dinner.reserveKcal+data.dinner.extraKcal:0;
+}
+$('saveBreakfast').onclick=()=>{data.breakfast={name:$('breakfastName').value.trim(),kcal:num('breakfastKcal'),registered:true};persist();render()};
+$('saveLunch').onclick=()=>{let n=num('lunchKcal');if(!n){alert('Introduce las calorías de la comida inicial.');return}data.lunch={name:$('lunchName').value.trim(),initialKcal:n,registered:true};data.dinner.reserveKcal=n-Math.round(n*.8);data.dinner.extraKcal=num('dinnerExtra');persist();render()};
+$('dinnerExtra').onchange=()=>{data.dinner.extraKcal=num('dinnerExtra');persist();render()};
+$('stored').onchange=e=>{data.dinner.stored=e.target.checked;persist()};
+$('dinnerDone').onchange=e=>{data.dinner.done=e.target.checked;persist()};
+let remaining=300, interval=null;
+function showClock(){let m=Math.floor(remaining/60),s=remaining%60;$('clock').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+$('startTimer').onclick=()=>{if(interval)return;$('timerStatus').textContent='Pausa en curso. Respira y observa tu saciedad.';interval=setInterval(()=>{remaining--;showClock();if(remaining<=0){clearInterval(interval);interval=null;data.timer.completed=true;persist();$('timerStatus').textContent='Pausa terminada. Continúa comiendo despacio y según tu hambre.';if('vibrate'in navigator)navigator.vibrate([180,80,180]);}},1000)};
+$('pauseTimer').onclick=()=>{if(interval){clearInterval(interval);interval=null;$('timerStatus').textContent='Temporizador pausado.'}};
+$('resetTimer').onclick=()=>{if(interval)clearInterval(interval);interval=null;remaining=300;showClock();$('timerStatus').textContent='Listo para empezar.'};
+$('exportJson').onclick=()=>{persist();let blob=new Blob([JSON.stringify({app:'MEALBRIDGE',version:1,exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mealbridge-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importJson').onclick=()=>$('jsonFile').click();
+$('jsonFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let obj=JSON.parse(await f.text());let incoming=obj.data||obj;if(!incoming.breakfast||!incoming.lunch||!incoming.dinner)throw Error();data=incoming;persist();render();alert('Copia importada correctamente.')}catch{alert('El JSON no tiene un formato MEALBRIDGE válido.')}e.target.value=''};
+render();showClock();
 </script>
-</body>
-</html>
+</body></html>
