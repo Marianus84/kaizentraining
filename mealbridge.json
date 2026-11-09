@@ -1,0 +1,43 @@
+{
+  "app": "MEALBRIDGE",
+  "version": 1,
+  "description": "Configuración y estructura de datos del prototipo MEALBRIDGE",
+  "rules": {
+    "breakfast": "Registro manual de alimentos y calorías",
+    "lunch": "Registrar las calorías de la comida completa inicialmente servida",
+    "lunch_allocation_percent": 80,
+    "dinner_reserve_percent": 20,
+    "dinner_formula": "round(initial_lunch_kcal * 0.20)",
+    "lunch_formula": "round(initial_lunch_kcal * 0.80)",
+    "mindful_pause_seconds": 300,
+    "timer_activation": "Manual, aproximadamente a mitad del almuerzo",
+    "dinner_complements": "Se registran por separado; no alteran la reserva automática"
+  },
+  "data": {
+    "date": "2026-11-09",
+    "breakfast": {
+      "name": "",
+      "kcal": 0,
+      "registered": false
+    },
+    "lunch": {
+      "name": "",
+      "initialKcal": 0,
+      "registered": false
+    },
+    "dinner": {
+      "reserveKcal": 0,
+      "extraKcal": 0,
+      "stored": false,
+      "done": false
+    },
+    "timer": {
+      "completed": false
+    }
+  },
+  "example": {
+    "initial_lunch_kcal": 1000,
+    "lunch_assigned_kcal": 800,
+    "dinner_reserved_kcal": 200
+  }
+}

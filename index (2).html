@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d19">
+<title>MEALBRIDGE — Mindful Meal System</title>
+<style>
+:root{--bg:#070b14;--panel:#111a2a;--panel2:#172337;--gold:#e3bd68;--gold2:#a98136;--text:#f5f2e9;--muted:#aab4c4;--line:#29364b;--green:#70d69a;--red:#ff8e8e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#172b46 0,#080e1a 45%,#050810 100%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:auto;padding:22px 16px 50px}.hero{text-align:center;padding:22px 8px 26px;background:linear-gradient(180deg,#1b2c42aa,#10182766);border:1px solid #31415a;border-radius:22px;margin-bottom:18px}
+.logo{font-family:Georgia,serif;letter-spacing:.16em;color:var(--gold);font-size:clamp(28px,7vw,44px);margin:0}.tag{font-size:11px;letter-spacing:.2em;color:#d5c08e;margin-top:5px}.date{color:var(--muted);font-size:13px;margin-top:14px}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px;color:var(--gold)}
+.card{background:linear-gradient(145deg,#152238,#0e1726);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 30px #0003}
+.meal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.pill{font-size:11px;border:1px solid #816b3c;color:var(--gold);padding:4px 9px;border-radius:20px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin:8px 0 5px}.field input{width:100%;background:#09111e;border:1px solid #34445c;color:var(--text);padding:12px;border-radius:10px;font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:12px 15px;font-weight:650;font-size:14px}.primary{background:linear-gradient(100deg,#f0d48d,#c69b4a);color:#17130a}.secondary{background:#202e43;color:var(--text);border:1px solid #3a4b64}.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.kcal{font-size:34px;color:var(--gold);font-weight:750;letter-spacing:-1px}.muted{color:var(--muted);font-size:13px}.split{display:grid;grid-template-columns:4fr 1fr;gap:8px;margin:14px 0}.split div{padding:13px;border-radius:12px;background:#20334a}.split div:last-child{background:#3b3020;border:1px solid #806638}.split strong{display:block;font-size:23px;color:var(--gold)}.bar{height:12px;background:#29374a;border-radius:99px;overflow:hidden;display:flex}.bar .eighty{width:80%;background:#d6b15e}.bar .twenty{width:20%;background:#7b91b0}
+.timer{text-align:center;padding:12px}.clock{font-size:clamp(48px,13vw,72px);font-variant-numeric:tabular-nums;color:var(--gold);font-weight:700;line-height:1.2;margin:8px}.timer-note{max-width:430px;margin:10px auto;color:var(--muted);font-size:13px}
+.checkline{display:flex;align-items:center;gap:9px;margin:10px 0;color:#e7eaf0;font-size:14px}.checkline input{accent-color:var(--gold);width:18px;height:18px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.metric{background:#0b1422;border:1px solid var(--line);padding:12px;border-radius:12px}.metric strong{display:block;color:var(--gold);font-size:22px}.metric span{font-size:11px;color:var(--muted)}
+.notice{border-left:3px solid var(--gold);padding:9px 12px;background:#201d18;color:#e6d7b5;font-size:12px;border-radius:0 9px 9px 0;margin-top:12px}
+footer{text-align:center;color:#78869a;font-size:11px;padding:18px}
+@media(max-width:520px){.wrap{padding:12px}.card{padding:15px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr 1fr}.actions button{min-width:100px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="hero">
+  <h1 class="logo">MEALBRIDGE</h1><div class="tag">THE MINDFUL THREE-MEAL SYSTEM</div>
+  <div class="date" id="today"></div>
+</header>
+
+<section class="card">
+ <div class="meal-head"><h2>01 · Desayuno</h2><span class="pill">REGISTRO MANUAL</span></div>
+ <div class="grid">
+  <div class="field"><label for="breakfastName">Descripción (opcional)</label><input id="breakfastName" placeholder="Ej. yogur, fruta y avena"></div>
+  <div class="field"><label for="breakfastKcal">Calorías del desayuno</label><input id="breakfastKcal" type="number" min="0" step="1" placeholder="0"></div>
+ </div>
+ <div class="actions"><button class="primary" id="saveBreakfast">Guardar desayuno</button></div>
+ <p class="muted" id="breakfastStatus">Desayuno todavía sin registrar.</p>
+</section>
+
+<section class="card">
+ <div class="meal-head"><h2>02 · Almuerzo</h2><span class="pill">REGISTRO MANUAL</span></div>
+ <p class="muted">Registra las calorías de la comida completa que te has servido inicialmente, antes de comer.</p>
+ <div class="grid">
+  <div class="field"><label for="lunchName">Descripción (opcional)</label><input id="lunchName" placeholder="Ej. milanesa napolitana"></div>
+  <div class="field"><label for="lunchKcal">Calorías de la comida inicial</label><input id="lunchKcal" type="number" min="0" step="1" placeholder="1000"></div>
+ </div>
+ <div class="actions"><button class="primary" id="saveLunch">Calcular reparto 80/20</button></div>
+ <div id="allocation" hidden>
+  <div class="split">
+   <div><strong id="lunch80">800 kcal</strong><span class="muted">80 % · Almuerzo</span></div>
+   <div><strong id="dinner20">200</strong><span class="muted">20 % · Cena</span></div>
+  </div>
+  <div class="bar"><div class="eighty"></div><div class="twenty"></div></div>
+  <p class="muted" id="allocationText"></p>
+ </div>
+ <div class="notice">El 80/20 es una distribución planificada de la comida inicial. No obliga a dejar comida si sigues teniendo hambre ni garantiza que esa cantidad sea suficiente para cenar.</div>
+</section>
+
+<section class="card timer">
+ <h2>03 · Pausa consciente</h2><span class="pill">TEMPORIZADOR · 5 MINUTOS</span>
+ <div class="clock" id="clock">05:00</div>
+ <p class="timer-note">Actívalo aproximadamente a mitad del almuerzo. Deja los cubiertos, descansa y observa cómo te sientes antes de continuar.</p>
+ <div class="actions"><button class="primary" id="startTimer">Iniciar pausa</button><button class="secondary" id="pauseTimer">Pausar</button><button class="ghost" id="resetTimer">Reiniciar</button></div>
+ <p class="muted" id="timerStatus" aria-live="polite">Listo para empezar.</p>
+</section>
+
+<section class="card">
+ <div class="meal-head"><h2>04 · Cena</h2><span class="pill">CÁLCULO AUTOMÁTICO</span></div>
+ <div class="kcal" id="dinnerValue">— kcal</div>
+ <p class="muted">Reserva calculada: 20 % de las calorías iniciales del almuerzo.</p>
+ <div class="field"><label for="dinnerExtra">Complementos de la cena (kcal, opcional)</label><input id="dinnerExtra" type="number" min="0" step="1" value="0"></div>
+ <label class="checkline"><input type="checkbox" id="stored"> He guardado la reserva en el recipiente y refrigerado la comida.</label>
+ <label class="checkline"><input type="checkbox" id="dinnerDone"> He terminado de cenar.</label>
+ <p class="muted" id="dinnerStatus">La cena se calculará al registrar el almuerzo.</p>
+ <div class="notice">La cifra de cena es una asignación prevista, no una afirmación de que hayas consumido esas calorías. Registra los complementos y confirma lo que realmente comas.</div>
+</section>
+
+<section class="card">
+ <h2>Resumen del día</h2>
+ <div class="summary">
+  <div class="metric"><strong id="sumBreakfast">0</strong><span>Desayuno kcal</span></div>
+  <div class="metric"><strong id="sumLunch">0</strong><span>Almuerzo asignado kcal</span></div>
+  <div class="metric"><strong id="sumDinner">0</strong><span>Cena prevista kcal</span></div>
+ </div>
+ <div class="actions"><button class="secondary" id="exportJson">Exportar JSON</button><button class="ghost" id="importJson">Importar JSON</button><input id="jsonFile" type="file" accept="application/json,.json" hidden></div>
+ <p class="muted">Los datos se guardan en este navegador. Exporta una copia para conservarlos o trasladarlos a otro dispositivo.</p>
+</section>
+<footer>MEALBRIDGE · SERVE. SAVOR. SAVE.<br>Prototipo local · No sustituye asesoramiento nutricional.</footer>
+</main>
+<script>
+const KEY='mealbridgeDataV1';
+const fresh=()=>({date:new Date().toISOString().slice(0,10),breakfast:{name:'',kcal:0,registered:false},lunch:{name:'',initialKcal:0,registered:false},dinner:{reserveKcal:0,extraKcal:0,stored:false,done:false},timer:{completed:false}});
+let data=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||fresh()}catch{return fresh()}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));}
+const $=id=>document.getElementById(id);
+function num(id){return Math.max(0,Math.round(Number($(id).value)||0))}
+function render(){
+ $('today').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ $('breakfastName').value=data.breakfast.name||'';$('breakfastKcal').value=data.breakfast.kcal||'';
+ $('lunchName').value=data.lunch.name||'';$('lunchKcal').value=data.lunch.initialKcal||'';
+ $('breakfastStatus').textContent=data.breakfast.registered?`Registrado: ${data.breakfast.kcal} kcal`:'Desayuno todavía sin registrar.';
+ $('allocation').hidden=!data.lunch.registered;
+ if(data.lunch.registered){let n=data.lunch.initialKcal;let a=Math.round(n*.8),b=n-a;$('lunch80').textContent=a+' kcal';$('dinner20').textContent=b+' kcal';$('allocationText').textContent=`Comida inicial: ${n} kcal · reparto automático 80/20.`}
+ $('dinnerValue').textContent=data.lunch.registered?data.dinner.reserveKcal+' kcal':'— kcal';
+ $('dinnerExtra').value=data.dinner.extraKcal||0;$('stored').checked=!!data.dinner.stored;$('dinnerDone').checked=!!data.dinner.done;
+ $('dinnerStatus').textContent=data.lunch.registered?`Reserva prevista: ${data.dinner.reserveKcal} kcal · Cena prevista con complementos: ${data.dinner.reserveKcal+data.dinner.extraKcal} kcal.`:'La cena se calculará al registrar el almuerzo.';
+ $('sumBreakfast').textContent=data.breakfast.registered?data.breakfast.kcal:0;
+ $('sumLunch').textContent=data.lunch.registered?Math.round(data.lunch.initialKcal*.8):0;
+ $('sumDinner').textContent=data.lunch.registered?data.dinner.reserveKcal+data.dinner.extraKcal:0;
+}
+$('saveBreakfast').onclick=()=>{data.breakfast={name:$('breakfastName').value.trim(),kcal:num('breakfastKcal'),registered:true};persist();render()};
+$('saveLunch').onclick=()=>{let n=num('lunchKcal');if(!n){alert('Introduce las calorías de la comida inicial.');return}data.lunch={name:$('lunchName').value.trim(),initialKcal:n,registered:true};data.dinner.reserveKcal=n-Math.round(n*.8);data.dinner.extraKcal=num('dinnerExtra');persist();render()};
+$('dinnerExtra').onchange=()=>{data.dinner.extraKcal=num('dinnerExtra');persist();render()};
+$('stored').onchange=e=>{data.dinner.stored=e.target.checked;persist()};
+$('dinnerDone').onchange=e=>{data.dinner.done=e.target.checked;persist()};
+let remaining=300, interval=null;
+function showClock(){let m=Math.floor(remaining/60),s=remaining%60;$('clock').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+$('startTimer').onclick=()=>{if(interval)return;$('timerStatus').textContent='Pausa en curso. Respira y observa tu saciedad.';interval=setInterval(()=>{remaining--;showClock();if(remaining<=0){clearInterval(interval);interval=null;data.timer.completed=true;persist();$('timerStatus').textContent='Pausa terminada. Continúa comiendo despacio y según tu hambre.';if('vibrate'in navigator)navigator.vibrate([180,80,180]);}},1000)};
+$('pauseTimer').onclick=()=>{if(interval){clearInterval(interval);interval=null;$('timerStatus').textContent='Temporizador pausado.'}};
+$('resetTimer').onclick=()=>{if(interval)clearInterval(interval);interval=null;remaining=300;showClock();$('timerStatus').textContent='Listo para empezar.'};
+$('exportJson').onclick=()=>{persist();let blob=new Blob([JSON.stringify({app:'MEALBRIDGE',version:1,exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mealbridge-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importJson').onclick=()=>$('jsonFile').click();
+$('jsonFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let obj=JSON.parse(await f.text());let incoming=obj.data||obj;if(!incoming.breakfast||!incoming.lunch||!incoming.dinner)throw Error();data=incoming;persist();render();alert('Copia importada correctamente.')}catch{alert('El JSON no tiene un formato MEALBRIDGE válido.')}e.target.value=''};
+render();showClock();
+</script>
+</body></html>
